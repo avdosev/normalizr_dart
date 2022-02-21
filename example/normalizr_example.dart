@@ -16,6 +16,7 @@ final article = Entity('articles', const {
 });
 
 void main() {
+  [user, comment, article].forEach(Entities.I.add);
   final normalizedData = normalize(data, article);
   JsonEncoder encoder = JsonEncoder.withIndent('  ');
   String prettyprint = encoder.convert(normalizedData);
