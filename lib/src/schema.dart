@@ -12,9 +12,23 @@ class Ref extends Schema {
   });
 }
 
-class Entity extends Schema {
+class Entity {
   final String name;
   final Map<String, Ref> definition;
+  final EntityOptions options;
 
-  const Entity(this.name, [this.definition = const {}]);
+  const Entity(
+    this.name, [
+    this.definition = const {},
+    this.options = const EntityOptions(),
+  ]);
+}
+
+class EntityOptions {
+  /// Name identificator of id
+  final String id;
+
+  const EntityOptions({
+    this.id = "id",
+  });
 }
