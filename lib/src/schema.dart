@@ -4,13 +4,17 @@ abstract class Schema {
 
 class Ref extends Schema {
   final String name;
+  final bool array;
 
-  const Ref(this.name);
+  const Ref(
+    this.name, {
+    this.array = false,
+  });
 }
 
 class Entity extends Schema {
   final String name;
-  final Map<String, Entity> definition;
+  final Map<String, Ref> definition;
 
   const Entity(this.name, [this.definition = const {}]);
 }
