@@ -1,4 +1,4 @@
 library normalizr;
 
-export 'src/schema.dart';
-export 'src/normalize.dart';
+export 'core.dart';
+export 'src/public.dart';

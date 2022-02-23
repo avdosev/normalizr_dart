@@ -5,18 +5,20 @@ import 'dart:convert';
 final user = Entity('users');
 
 // Define your comments schema
-final comment = Entity('comments', const {
+final comment = Entity('comments', {
   'commenter': Ref('users'),
 });
 
 // Define your article
-final article = Entity('articles', const {
+final article = Entity('articles', {
   'author': Ref('users'),
   'comments': Ref('comments', array: true),
 });
 
 void main() {
-  [user, comment, article].forEach(Entities.I.add);
+  // setup
+  normalizr.addAll([user, comment, article]);
+  // normalize
   final normalizedData = normalize(data, article);
   JsonEncoder encoder = JsonEncoder.withIndent('  ');
   String prettyprint = encoder.convert(normalizedData);
