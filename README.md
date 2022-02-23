@@ -1,39 +1,110 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# normalizr &middot; ![build status](https://github.com/avdosev/normalizr_dart/workflows/unittests/badge.svg)
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+Simple package for json normalization just like [normalizr](https://github.com/paularmstrong/normalizr).
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+## About
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Many APIs, public or not, return JSON data that has deeply nested objects. Using data in this kind of structure is often very difficult. 
 
-## Features
+Normalizr is a small, but powerful utility for taking JSON with a schema definition and returning nested entities with their IDs, gathered in dictionaries.
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+## Links
 
-## Getting started
+[Pub dev][pubdev]
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+[Documentation][docs]
+
+[Issue tracker][tracker]
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
+Example input json
+```json
+{
+  "id": "123",
+  "author": {"id": "1", "name": "Paul"},
+  "title": "My awesome blog post",
+  "comments": [
+    {
+      "id": "324",
+      "commenter": {"id": "2", "name": "Nicole"}
+    }
+  ]
+}
+```
+Normalize:
 ```dart
-const like = 'sample';
+import 'package:normalizr/normalizr.dart';
+import 'dart:convert';
+
+// Define a users schema
+final user = Entity('users');
+
+// Define your comments schema
+final comment = Entity('comments', {
+  'commenter': Ref('users'),
+});
+
+// Define your article
+final article = Entity('articles', {
+  'author': Ref('users'),
+  'comments': Ref('comments', array: true),
+});
+
+void main() {
+  // setup
+  normalizr.addAll([user, comment, article]);
+  
+  final data = ... // some json
+
+  // normalize json data
+  final normalizedData = normalize(data, article);
+  // output
+  final encoder = JsonEncoder.withIndent('  ');
+  String prettyJson = encoder.convert(normalizedData);
+  print(prettyJson);
+}
+```
+output:
+```json
+{
+  "result": "123",
+  "type": "articles",
+  "entities": {
+    "users": {
+      "1": {
+        "id": "1",
+        "name": "Paul"
+      },
+      "2": {
+        "id": "2",
+        "name": "Nicole"
+      }
+    },
+    "comments": {
+      "324": {
+        "id": "324",
+        "commenter": "2"
+      }
+    },
+    "articles": {
+      "123": {
+        "id": "123",
+        "author": "1",
+        "title": "My awesome blog post",
+        "comments": [
+          "324"
+        ]
+      }
+    }
+  }
+}
 ```
 
-## Additional information
+## Features and bugs
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Please file feature requests and bugs at the [issue tracker][tracker].
+
+[tracker]: https://github.com/avdosev/normalizr_dart/issues
+[pubdev]: https://pub.dev/packages/normalizr
+[docs]: https://pub.dev/documentation/normalizr/latest/
