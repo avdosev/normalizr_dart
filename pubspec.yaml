@@ -1,14 +1,10 @@
 name: normalizr
-description: A starting point for Dart libraries or applications.
+description: Normalizr is a small, but powerful utility for taking JSON with a schema definition and returning nested entities with their IDs, gathered in dictionaries.
 version: 0.0.1
 repository: https://github.com/avdosev/normalizr_dart
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
-
-
-# dependencies:
-#   path: ^1.8.0
 
 dev_dependencies:
   lints: ^1.0.0
