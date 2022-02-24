@@ -1,6 +1,5 @@
 import 'package:normalizr/normalizr.dart';
 import 'package:test/test.dart';
-import 'dart:collection';
 
 void main() {
   group('normalize', () {
