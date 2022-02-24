@@ -14,6 +14,8 @@ class Normalizr {
 
   void addAll(Iterable<Entity> schemas) => schemas.forEach(add);
 
+  void clear() => _schemas.clear();
+
   Entity find(String name) {
     final schema = _schemas[name];
     if (schema == null) {

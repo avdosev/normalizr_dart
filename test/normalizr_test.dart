@@ -1,16 +1,45 @@
-// import 'package:normalizr/normalizr.dart';
-// import 'package:test/test.dart';
+import 'package:normalizr/normalizr.dart';
+import 'package:test/test.dart';
+import 'dart:collection';
 
-// void main() {
-//   group('A group of tests', () {
-//     final awesome = Awesome();
+void main() {
+  group('normalize', () {
+    setUp(() {
+      normalizr.clear();
+    });
 
-//     setUp(() {
-//       // Additional setup goes here.
-//     });
+    test('circular references', () {
+      const user = Entity('users', {
+        'friends': Ref('users', array: true),
+      });
 
-//     test('First Test', () {
-//       expect(awesome.isAwesome, isTrue);
-//     });
-//   });
-// }
+      normalizr.add(user);
+
+      final input = {
+        'id': '123',
+        'nick': 'first',
+        'friends': [
+          {'id': '124', 'nick': 'second'},
+        ]
+      };
+
+      expect(normalize(input, user), {
+        'result': '123',
+        'type': 'users',
+        'entities': {
+          'users': {
+            '123': {
+              'id': '123',
+              'nick': 'first',
+              'friends': ['124'],
+            },
+            '124': {
+              'id': '124',
+              'nick': 'second',
+            },
+          }
+        }
+      });
+    });
+  });
+}
