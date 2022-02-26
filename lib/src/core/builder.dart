@@ -25,8 +25,8 @@ class Normalizr {
   }
 
   dynamic normalize(dynamic json, Entity schema) {
-    final result = <String, dynamic>{};
-    void accumulator(String name, String key, dynamic entity) {
+    final result = <dynamic, dynamic>{};
+    void accumulator(String name, dynamic key, dynamic entity) {
       result[name] ??= {};
       result[name][key] = entity;
     }

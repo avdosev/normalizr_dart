@@ -1,8 +1,8 @@
 import 'schema.dart';
 
-String normalize(Map<String, dynamic> json, Entity schema,
+dynamic /*String|Int*/ normalize(Map json, Entity schema,
     AccumulatorCallback accumulator, SchemeFinder find) {
-  final result = <String, dynamic>{};
+  final result = <dynamic, dynamic>{};
   for (final field in json.entries) {
     if (schema.definition.containsKey(field.key)) {
       if (schema.definition[field.key]!.array) {
@@ -38,7 +38,7 @@ String normalize(Map<String, dynamic> json, Entity schema,
 
 typedef AccumulatorCallback = void Function(
   String name,
-  String key,
+  dynamic key,
   dynamic entity,
 );
 
