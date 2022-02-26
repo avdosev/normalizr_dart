@@ -12,7 +12,7 @@ final comment = Entity('comments', {
 // Define your article
 final article = Entity('articles', {
   'author': Ref('users'),
-  'comments': Ref('comments', array: true),
+  'comments': Ref.list('comments'),
 });
 
 void main() {

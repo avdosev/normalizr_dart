@@ -1,32 +1,31 @@
 import 'schema.dart';
+import 'entity.dart';
 
 dynamic /*String|Int*/ normalize(Map json, Entity schema,
     AccumulatorCallback accumulator, SchemeFinder find) {
   final result = <dynamic, dynamic>{};
   for (final field in json.entries) {
     if (schema.definition.containsKey(field.key)) {
-      if (schema.definition[field.key]!.array) {
+      final define = schema.definition[field.key]!;
+
+      if (define is SchemaList) {
         final entities = field.value as List;
-        final ids = entities
-            .map(
-              (entity) => normalize(
-                entity,
-                find(schema.definition[field.key]!.name),
-                accumulator,
-                find,
-              ),
-            )
-            .toList();
-        result[field.key] = ids;
-      } else {
-        final entity = field.value;
-        final id = normalize(
-          entity,
-          find(schema.definition[field.key]!.name),
-          accumulator,
-          find,
+        final ids = define.doCallback(
+          entities,
+          (json, nextScheme) {
+            final entity = nextScheme.getEntity(json, find);
+            return nextScheme.useId(
+              normalize(json, entity, accumulator, find),
+              entity,
+            );
+          },
         );
-        result[field.key] = id;
+        result[field.key] = ids;
+      } else if (define is Schema) {
+        final entity = field.value;
+        final nextScheme = define.getEntity(entity, find);
+        final id = normalize(entity, nextScheme, accumulator, find);
+        result[field.key] = define.useId(id, nextScheme);
       }
     } else {
       result[field.key] = field.value;

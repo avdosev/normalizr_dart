@@ -1,34 +1,63 @@
-abstract class Schema {
+import 'entity.dart';
+import 'normalize.dart';
+
+abstract class ISchema {
+  const ISchema();
+}
+
+typedef DoCallback = dynamic Function(dynamic json, Schema schema);
+
+abstract class Schema extends ISchema {
   const Schema();
+
+  Entity getEntity(dynamic json, SchemeFinder find);
+  dynamic useId(dynamic id, Entity entity);
+}
+
+class SchemaList extends ISchema {
+  final Schema schema;
+
+  const SchemaList(this.schema);
+
+  dynamic doCallback(dynamic json, DoCallback callback) {
+    return (json as List).map((item) => callback(item, schema)).toList();
+  }
 }
 
 class Ref extends Schema {
   final String name;
-  final bool array;
 
   const Ref(
-    this.name, {
-    this.array = false,
-  });
+    this.name,
+  );
+
+  static SchemaList list(String name) => SchemaList(Ref(name));
+
+  @override
+  Entity getEntity(dynamic json, SchemeFinder find) => find(name);
+
+  @override
+  useId(dynamic id, Entity entity) => id;
 }
 
-class Entity {
-  final String name;
-  final Map<String, Ref> definition;
-  final EntityOptions options;
+typedef LookupCallback = Ref Function(dynamic json);
 
-  const Entity(
-    this.name, [
-    this.definition = const {},
-    this.options = const EntityOptions(),
-  ]);
-}
+class Union extends Schema {
+  final LookupCallback lookup;
 
-class EntityOptions {
-  /// Name identificator of id
-  final String id;
+  const Union(
+    this.lookup,
+  );
 
-  const EntityOptions({
-    this.id = "id",
-  });
+  static SchemaList list(LookupCallback lookup) => SchemaList(Union(lookup));
+
+  @override
+  Entity getEntity(dynamic json, SchemeFinder find) =>
+      lookup(json).getEntity(json, find);
+
+  @override
+  useId(id, Entity entity) => {
+        'id': id,
+        'type': entity.name,
+      };
 }

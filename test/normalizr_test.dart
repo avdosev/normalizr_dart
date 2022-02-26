@@ -16,7 +16,7 @@ void main() {
 
       final article = Entity('articles', {
         'author': Ref('users'),
-        'comments': Ref('comments', array: true),
+        'comments': Ref.list('comments'),
       });
 
       normalizr.addAll([user, comment, article]);
@@ -57,8 +57,8 @@ void main() {
     });
 
     test('circular references', () {
-      const user = Entity('users', {
-        'friends': Ref('users', array: true),
+      final user = Entity('users', {
+        'friends': Ref.list('users'),
       });
 
       normalizr.add(user);
@@ -85,6 +85,49 @@ void main() {
               'id': 124,
               'nick': 'second',
             },
+          }
+        }
+      });
+    });
+
+    test('union', () {
+      final dataList = Entity('data-list', {
+        'data': Union.list((json) => Ref(json['type'] + 's')),
+      });
+
+      final question = Entity('questions');
+      final post = Entity('posts');
+
+      normalizr.addAll([question, post]);
+
+      final input = {
+        'data': [
+          {'id': '1-1', 'type': 'post', 'post-data': 'data post'},
+          {'id': '2-1', 'type': 'question', 'question-data': 'data question'},
+        ]
+      };
+
+      expect(normalize(input, dataList), {
+        'result': null,
+        'type': 'data-list',
+        'entities': {
+          'data-list': {
+            null: {
+              'data': [
+                {'id': '1-1', 'type': 'posts'},
+                {'id': '2-1', 'type': 'questions'},
+              ]
+            }
+          },
+          'questions': {
+            '2-1': {
+              'id': '2-1',
+              'type': 'question',
+              'question-data': 'data question',
+            },
+          },
+          'posts': {
+            '1-1': {'id': '1-1', 'type': 'post', 'post-data': 'data post'},
           }
         }
       });

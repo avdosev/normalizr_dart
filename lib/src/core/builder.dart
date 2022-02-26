@@ -1,4 +1,4 @@
-import 'schema.dart';
+import 'entity.dart';
 import 'normalize.dart' as n;
 
 class Normalizr {
