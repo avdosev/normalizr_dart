@@ -1,6 +1,6 @@
 name: normalizr
 description: Normalizr is a small, but powerful utility for taking JSON with a schema definition and returning nested entities with their IDs, gathered in dictionaries.
-version: 0.0.1
+version: 0.1.1
 repository: https://github.com/avdosev/normalizr_dart
 
 environment:
